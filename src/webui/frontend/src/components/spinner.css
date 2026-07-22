@@ -1,0 +1,55 @@
+/* Ported near-verbatim from BuildBuddy's app/components/spinner/spinner.css (MIT licensed):
+   https://github.com/buildbuddy-io/buildbuddy/blob/master/app/components/spinner/spinner.css */
+.spinner {
+  --size: 24px;
+
+  width: var(--size);
+  height: var(--size);
+
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner.icon {
+  --size: var(--icon-size, 24px);
+}
+
+.spinner:before {
+  content: "";
+  display: block;
+  animation: rotate 2s linear infinite;
+  width: inherit;
+  height: inherit;
+  background-image: var(--spinner-image);
+  background-size: cover;
+}
+
+.spinner.white:before {
+  background-image: url("/image/loader-white.svg");
+}
+
+.spinner.small-spinner {
+  --size: 16px;
+}
+
+.spinner-overlay {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  background: var(--color-overlay-light-strong);
+  opacity: 1;
+  z-index: 1;
+}
+
+.dark .spinner-overlay {
+  background: var(--color-overlay-dark-medium);
+}
+
+.spinner-overlay:before {
+  width: var(--size);
+  height: var(--size);
+  opacity: 0.1;
+}

@@ -1,0 +1,305 @@
+/* Ported near-verbatim from BuildBuddy's app/terminal/terminal.css (MIT licensed):
+   https://github.com/buildbuddy-io/buildbuddy/blob/master/app/terminal/terminal.css */
+.terminal {
+  --scrollbar-width: 8px;
+  background: var(--color-terminal-bg);
+  display: flex;
+}
+.terminal.light-terminal {
+  background: var(--color-white);
+}
+
+.terminal .terminal-search {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 1024px) {
+  .terminal .terminal-search {
+    display: none;
+  }
+}
+
+.terminal .search-navigation {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 1280px) {
+  .terminal .search-navigation {
+    display: none;
+  }
+}
+
+.terminal .terminal-search-input {
+  height: 32px;
+  max-width: 180px;
+  border: 1px solid var(--color-gray-200);
+  border-radius: 8px;
+}
+
+.terminal.light-terminal .terminal-search-input {
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.terminal .terminal-text {
+  height: 400px;
+  overflow: visible;
+}
+
+.terminal .terminal-top-bar {
+  display: flex;
+  padding-right: var(--scrollbar-width);
+}
+
+.terminal .terminal-titles {
+  display: flex;
+  color: var(--color-terminal-text);
+}
+
+.terminal.light-terminal .terminal-titles {
+  color: var(--color-text-on-light-bg);
+}
+
+.terminal .terminal-actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.terminal button.terminal-action {
+  appearance: none;
+  background: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+.terminal .terminal-action .icon {
+  --icon-size: 20px;
+}
+
+.terminal .terminal-action:disabled {
+  opacity: 0.3;
+}
+
+.terminal .terminal-action:hover:not(:disabled) {
+  background: var(--color-overlay-light-subtle);
+}
+.terminal.light-terminal .terminal-action:hover:not(:disabled) {
+  background: var(--color-gray-200);
+}
+
+.terminal .terminal-action:focus:not(:disabled) {
+  border: 2px solid var(--color-overlay-light-subtle);
+}
+.terminal.light-terminal .terminal-action:focus:not(:disabled) {
+  border: 2px solid var(--color-gray-200);
+}
+
+.terminal .terminal-action:active:not(:disabled) {
+  background: var(--color-overlay-light-dim);
+}
+.terminal.light-terminal .terminal-action:active:not(:disabled) {
+  background: var(--color-gray-400);
+}
+
+.terminal .terminal-action:not(.active) .icon {
+  stroke: var(--color-gray-500);
+}
+.terminal.light-terminal .terminal-action:not(.active) .icon {
+  stroke: var(--color-blue-gray-100);
+}
+
+.terminal .terminal-line {
+  /* Render whitespace as-is and disable native line wrapping, since wrapping is
+     handled programmatically. Lines need to be fixed height so that
+     react-window can efficiently determine which lines are currently in the
+     viewport and need to be rendered. */
+  white-space: pre;
+  font-family: "Source Code Pro", monospace;
+}
+
+.terminal .terminal-line.selected {
+  background-color: var(--color-overlay-light-quarter);
+}
+
+.terminal .search-result-count {
+  /* Fit 6-digit result counts without layout shifting. */
+  min-width: 128px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  color: var(--color-terminal-text);
+}
+
+.terminal.light-terminal .search-result-count {
+  color: var(--color-text-on-light-bg);
+}
+
+.terminal .no-results {
+  opacity: 0.3;
+}
+
+.terminal .lines-list {
+  /* See https://github.com/mozilla-frontend-infra/react-lazylog/issues/90#issuecomment-988285254 */
+  overflow-x: scroll !important;
+}
+
+.terminal .terminal-line {
+  color: var(--color-terminal-text);
+}
+.terminal.light-terminal .terminal-line {
+  color: var(--color-gray-900);
+}
+
+/* Scrollbars */
+
+.terminal ::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+  height: var(--scrollbar-width);
+}
+
+.terminal ::-webkit-scrollbar-thumb {
+  background: var(--color-overlay-light-muted);
+  border-radius: calc(var(--scrollbar-width) / 2);
+}
+
+.terminal.light-terminal ::-webkit-scrollbar-thumb {
+  background: var(--color-overlay-dark);
+}
+
+.terminal ::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+/* ANSI styles */
+
+.terminal .ansi-bold {
+  font-weight: bold;
+}
+.terminal .ansi-italic {
+  font-style: italic;
+}
+.terminal .ansi-underline {
+  text-decoration: underline;
+}
+
+/* Dark terminal colors */
+
+.terminal .ansi-fg-black {
+  color: var(--color-black);
+}
+.terminal .ansi-fg-green {
+  color: var(--color-green-400);
+}
+.terminal .ansi-fg-red {
+  color: var(--color-red-400);
+}
+.terminal .ansi-fg-yellow {
+  color: var(--color-yellow-400);
+}
+.terminal .ansi-fg-blue {
+  color: var(--color-blue-400);
+}
+.terminal .ansi-fg-magenta {
+  color: var(--color-purple-400);
+}
+.terminal .ansi-fg-cyan {
+  color: var(--color-cyan-400);
+}
+.terminal .ansi-fg-white {
+  color: var(--color-white);
+}
+.terminal .ansi-fg-grey {
+  color: var(--color-gray-400);
+}
+.terminal .ansi-bg-black {
+  background-color: var(--color-black);
+}
+.terminal .ansi-bg-green {
+  background-color: var(--color-green-400);
+}
+.terminal .ansi-bg-red {
+  background-color: var(--color-red-400);
+}
+.terminal .ansi-bg-yellow {
+  background-color: var(--color-yellow-400);
+}
+.terminal .ansi-bg-blue {
+  background-color: var(--color-blue-400);
+}
+.terminal .ansi-bg-magenta {
+  background-color: var(--color-purple-400);
+}
+.terminal .ansi-bg-cyan {
+  background-color: var(--color-cyan-400);
+}
+.terminal .ansi-bg-white {
+  background-color: var(--color-white);
+}
+.terminal .ansi-bg-grey {
+  background-color: var(--color-gray-400);
+}
+
+/* Light terminal color overrides */
+
+.terminal.light-terminal .ansi-fg-green {
+  color: var(--color-green-700);
+}
+.terminal.light-terminal .ansi-fg-red {
+  color: var(--color-red-600);
+}
+.terminal.light-terminal .ansi-fg-yellow {
+  color: var(--color-yellow-800);
+}
+.terminal.light-terminal .ansi-fg-blue {
+  color: var(--color-blue-600);
+}
+.terminal.light-terminal .ansi-fg-magenta {
+  color: var(--color-purple-600);
+}
+.terminal.light-terminal .ansi-fg-cyan {
+  color: var(--color-cyan-600);
+}
+.terminal.light-terminal .ansi-fg-grey {
+  color: var(--color-gray-600);
+}
+
+.terminal .search-match {
+  background: var(--color-gray-800);
+  color: var(--color-text-inverted);
+}
+.terminal.light-terminal .search-match {
+  background: var(--color-bg-info-subtle);
+  color: var(--color-text-on-light-bg);
+}
+
+.terminal .active-search-match {
+  background: var(--color-gray-600);
+}
+.terminal.light-terminal .active-search-match {
+  background: var(--color-blue-gray-200);
+}
+
+/* Page-specific overrides */
+
+.expanded .terminal .terminal-text,
+.test-log .terminal-text {
+  height: calc(100vh - 200px);
+}
+
+.invocation-action-card .terminal {
+  padding: 8px 16px;
+  border-radius: 8px;
+}

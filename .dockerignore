@@ -1,0 +1,6 @@
+.git
+data/
+**/node_modules
+src/webui/static/dist
+.env
+*.md

@@ -1,0 +1,5 @@
+/data/
+node_modules/
+*.tsbuildinfo
+/src/webui/static/dist
+.env

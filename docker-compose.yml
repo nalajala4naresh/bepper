@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bepper
+    volumes:
+      # postgres:18+ images store data in a version-specific subdirectory
+      # under /var/lib/postgresql itself, not /var/lib/postgresql/data
+      # (see https://github.com/docker-library/postgres/pull/1259).
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  bepper:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "1985:1985"
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      # Overrides main.go's localhost default so the container reaches
+      # Postgres by its service name rather than its own loopback address.
+      BEP_POSTGRES_DSN: postgres://postgres:postgres@postgres:5432/bepper?sslmode=disable
+    volumes:
+      - bepper-data:/app/data
+
+  # Local remote cache for validating src/bytestream: Bazel uploads outputs
+  # here via --remote_cache and reports bytestream:// URIs in its BEP events;
+  # bepper's own bytestream client (src/bytestream) then dials this same
+  # server directly to fetch blobs for the Targets tab. It's dialed by
+  # whatever host:port bazel was given, embedded verbatim in each URI — see
+  # the "bazel command" note in README/chat history: that must be an
+  # address reachable both from the host (where bazel runs) and from inside
+  # this container (where bepper fetches from), so "localhost" won't work
+  # for either side consistently. Use the host machine's LAN IP for
+  # --remote_cache instead (e.g. `ipconfig getifaddr en0` on macOS).
+  bazel-remote:
+    image: buchgr/bazel-remote-cache:latest
+    command: ["--max_size=5"]
+    ports:
+      - "9090:8080" # HTTP REST cache API (bepper's own web UI already owns 8080)
+      - "9092:9092" # gRPC ByteStream/CAS/ActionCache API
+    volumes:
+      - bazel-remote-data:/data
+
+volumes:
+  pgdata:
+  bepper-data:
+  bazel-remote-data:

@@ -1,0 +1,706 @@
+/* App chrome (list/detail layout) — original code, styled in the spirit of
+   BuildBuddy's invocation.css but not copied from it (that file leans on
+   CSS custom properties defined across their wider design system). The
+   ported app/terminal component brings its own terminal.css. */
+
+:root {
+  color-scheme: dark;
+  --bg: #0d1117;
+  --panel: #161b22;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --muted: #8b949e;
+  --link: #58a6ff;
+  --success: #3fb950;
+  --failure: #f85149;
+  --warning: #d29922;
+  --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+header.topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+header.topbar .logo {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.auth-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-pill.success {
+  background: rgba(63, 185, 80, 0.15);
+  color: var(--success);
+}
+
+.status-pill.failure {
+  background: rgba(248, 81, 73, 0.15);
+  color: var(--failure);
+}
+
+.status-pill .dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+table.invocations {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.invocations th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+table.invocations td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+table.invocations tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 0.85em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.detail-header h1 {
+  font-size: 1.1rem;
+  margin: 0;
+  font-family: var(--mono);
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.info-cell {
+  background: var(--panel);
+  padding: 0.6rem 0.9rem;
+}
+
+.info-cell .label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  margin-bottom: 0.2rem;
+}
+
+.info-cell .value {
+  word-break: break-word;
+}
+
+.log-panel h2 {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+
+.log-panel .terminal-wrapper {
+  height: 60vh;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tag {
+  display: inline-block;
+  background: rgba(88, 166, 255, 0.15);
+  color: var(--link);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+  margin: 0 0.25rem 0.25rem 0;
+}
+
+/* Filter bar (invocation list) */
+
+.filter-bar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.filter-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  color: var(--muted);
+}
+
+.filter-input input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font: inherit;
+}
+
+.filter-bar select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  color: var(--text);
+  font: inherit;
+}
+
+.filter-date {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.35rem 0.6rem;
+  color: var(--text);
+  font: inherit;
+  color-scheme: dark;
+}
+
+.filter-date-sep {
+  align-self: center;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 720px) {
+  .filter-bar {
+    flex-wrap: wrap;
+  }
+}
+
+.load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+.load-more button {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 1.2rem;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.load-more button:hover {
+  border-color: var(--link);
+}
+
+.load-more button:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
+/* Tabs (invocation detail) */
+
+.tab-bar {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+
+.tab-bar button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font: inherit;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tab-bar button:hover {
+  color: var(--text);
+}
+
+.tab-bar button.active {
+  color: var(--text);
+  border-bottom-color: var(--link);
+}
+
+/* Error banner */
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  color: var(--failure);
+  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
+}
+
+/* Targets tab — master-detail layout: a filterable, status-grouped list of
+   targets on the left, and the currently-selected target's full detail
+   (failure message, log files) on the right. */
+
+.targets-filter {
+  margin-bottom: 1rem;
+}
+
+.targets-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.targets-sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.targets-sidebar-empty {
+  padding: 0.75rem 0.9rem;
+}
+
+.targets-detail-pane {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.1rem;
+}
+
+@media (max-width: 800px) {
+  .targets-layout {
+    flex-direction: column;
+  }
+
+  .targets-sidebar {
+    width: 100%;
+    max-height: 40vh;
+  }
+}
+
+.target-list-group-header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.target-list-group-header:hover {
+  filter: brightness(1.15);
+}
+
+.targets-summary-failure {
+  background: rgba(248, 81, 73, 0.1);
+  color: var(--failure);
+}
+
+.targets-summary-warning {
+  background: rgba(210, 153, 34, 0.1);
+  color: var(--warning);
+}
+
+.targets-summary-success {
+  background: rgba(63, 185, 80, 0.1);
+  color: var(--success);
+}
+
+.target-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+}
+
+.target-list-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.target-list-item.selected {
+  background: rgba(88, 166, 255, 0.08);
+  border-left-color: var(--link);
+}
+
+.target-list-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+.target-list-duration {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.chevron {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.chevron-spacer {
+  width: 14px;
+  flex-shrink: 0;
+}
+
+.target-icon.success {
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+.target-icon.failure {
+  color: var(--failure);
+  flex-shrink: 0;
+}
+
+.target-icon.warning {
+  color: var(--warning);
+  flex-shrink: 0;
+}
+
+.target-copy-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0.15rem;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  border-radius: 4px;
+}
+
+.target-copy-btn:hover {
+  color: var(--link);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.target-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.target-detail-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.target-detail-meta {
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.target-failure {
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.8rem;
+  background: #010409;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--failure);
+}
+
+.log-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.log-file-ref-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.log-file-ref {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.log-file-name {
+  font-weight: 600;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.log-file-uri {
+  word-break: break-all;
+  flex: 1;
+}
+
+.log-file-view-btn {
+  flex-shrink: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  color: var(--link);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.log-file-view-btn:hover {
+  border-color: var(--link);
+}
+
+.log-file-view-btn:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
+.log-file-error {
+  color: var(--failure);
+  font-size: 0.8rem;
+}
+
+.log-file-content {
+  background: #010409;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 300px;
+  overflow: auto;
+  margin: 0;
+}
+
+/* Parsed test.xml (JUnit) view */
+
+.test-suite-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.test-suite {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.test-suite-summary {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+
+.test-case-row {
+  border-bottom: 1px solid var(--border);
+}
+
+.test-case-row:last-child {
+  border-bottom: none;
+}
+
+.test-case-row-main {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.test-case-row.expandable .test-case-row-main {
+  cursor: pointer;
+}
+
+.test-case-row.expandable .test-case-row-main:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.target-icon.muted-icon {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.test-case-name {
+  flex: 1;
+  word-break: break-all;
+}
+
+.test-case-time {
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.test-case-detail {
+  margin: 0 0.75rem 0.6rem 2.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.test-case-message {
+  font-size: 0.8rem;
+  color: var(--failure);
+  word-break: break-word;
+}
+
+/* Raw tab */
+
+.raw-events {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  background: #010409;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  white-space: pre;
+  overflow: auto;
+  max-height: 75vh;
+}
+
+/* Per-attempt test history (Targets tab detail pane) */
+
+.attempts-table {
+  margin-top: 1rem;
+}
+
+.attempts-table h4,
+.log-file-list h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  margin: 0 0 0.4rem;
+  font-weight: 600;
+}
+
+.attempts-table .cached-badge {
+  font-size: 0.7rem;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.05rem 0.5rem;
+  margin-left: 0.4rem;
+}

@@ -1,0 +1,42 @@
+/* Ported near-verbatim from BuildBuddy's app/components/input/input.css (MIT licensed):
+   https://github.com/buildbuddy-io/buildbuddy/blob/master/app/components/input/input.css */
+.text-input {
+  height: 40px;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--color-select-border);
+  border-radius: 8px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+.text-input.dark {
+  background-color: #212121;
+  color: white;
+  caret-color: white;
+}
+
+.text-input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.text-input[readonly] {
+  background: var(--color-form-input-bg-secondary);
+}
+
+.text-input.invalid {
+  border: 1px solid var(--color-red-600);
+}
+
+/* Hide up/down buttons on number inputs. */
+.text-input::-webkit-outer-spin-button,
+.text-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+.text-input[type="number"] {
+  -moz-appearance: textfield;
+}

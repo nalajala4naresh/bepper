@@ -1,0 +1,80 @@
+// Ported near-verbatim from BuildBuddy's app/terminal/row.tsx (MIT licensed):
+// https://github.com/buildbuddy-io/buildbuddy/blob/master/app/terminal/row.tsx
+import React from "react";
+import { ListChildComponentProps } from "react-window";
+import router from "../router";
+import { ListData, SpanData, computeRows } from "./text";
+
+export const ROW_HEIGHT_PX = 20;
+
+/**
+ * Renders a single row in the terminal. A row may be a complete line, or a part
+ * of a wrapped line (if wrapping is enabled).
+ */
+export function Row({ data, index, style }: ListChildComponentProps<ListData>) {
+  const rowData = data.rows[index];
+  // Use the memoized version of getRows(), since we'll call it several times in
+  // quick succession when rendering each row of a wrapped line.
+  const rowsForLine = computeRows(
+    rowData.plaintext,
+    data.rowLength,
+    data.searchQuery,
+    rowData.matchStartIndex,
+    rowData.tags
+  );
+  const row = rowsForLine[rowData.wrapOffset];
+  if (!row) {
+    console.error("Row mismatch:", { rowData, rowsForLine });
+    return null;
+  }
+
+  let selected = router.getLineNumber() === index + 1;
+  return (
+    <div
+      onClick={() => (location.hash = `${router.getTab()}@${index + 1}`)}
+      style={{
+        ...style,
+        // Set line-height to match row height so that selection highlights
+        // are sized properly.
+        lineHeight: `${ROW_HEIGHT_PX}px`,
+      }}
+      className={selected ? "terminal-line selected" : "terminal-line"}>
+      {row.map((part, i) => (
+        <RowSpan key={i} {...part} isActiveMatch={part.matchIndex === data.activeMatchIndex} />
+      ))}
+      {row === rowsForLine[rowsForLine.length - 1] && "\n"}
+    </div>
+  );
+}
+
+interface RowSpanProps extends SpanData {
+  isActiveMatch: boolean;
+}
+
+/**
+ * Renders a `<span>` with one or more ANSI styles applied to the whole span.
+ *
+ * If the span is a link, an `<a>` tag will be used instead.
+ */
+function RowSpan({ text, matchIndex, isActiveMatch, style, link }: RowSpanProps) {
+  if (!style) style = {};
+  const className = [
+    style.background && `ansi-bg-${style.background}`,
+    style.foreground && `ansi-fg-${style.foreground}`,
+    style.bold && "ansi-bold",
+    style.italic && "ansi-italic",
+    style.underline && "ansi-underline",
+    matchIndex !== null && "search-match",
+    isActiveMatch && "active-search-match",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  if (link) {
+    return (
+      <a href={link} target="_blank" className={className}>
+        {text}
+      </a>
+    );
+  }
+  return <span className={className}>{text}</span>;
+}

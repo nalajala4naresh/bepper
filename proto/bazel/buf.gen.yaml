@@ -1,0 +1,36 @@
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: go_package
+      path: build_event_stream/build_event_stream.proto
+      value: github.com/nalajala4naresh/bepper/proto/gen/build_event_stream
+    - file_option: go_package
+      path: command_line/command_line.proto
+      value: github.com/nalajala4naresh/bepper/proto/gen/command_line
+    - file_option: go_package
+      path: failure_details/failure_details.proto
+      value: github.com/nalajala4naresh/bepper/proto/gen/failure_details
+    - file_option: go_package
+      path: invocation_policy/invocation_policy.proto
+      value: github.com/nalajala4naresh/bepper/proto/gen/invocation_policy
+    - file_option: go_package
+      path: option_filters/option_filters.proto
+      value: github.com/nalajala4naresh/bepper/proto/gen/option_filters
+    - file_option: go_package
+      path: strategy_policy/strategy_policy.proto
+      value: github.com/nalajala4naresh/bepper/proto/gen/strategy_policy
+    - file_option: go_package
+      path: action_cache/action_cache.proto
+      value: github.com/nalajala4naresh/bepper/proto/gen/action_cache
+    - file_option: go_package
+      path: package_load_metrics/package_load_metrics.proto
+      value: github.com/nalajala4naresh/bepper/proto/gen/package_load_metrics
+    - file_option: go_package
+      path: analysis_cache_service_metadata_status/analysis_cache_service_metadata_status.proto
+      value: github.com/nalajala4naresh/bepper/proto/gen/analysis_cache_service_metadata_status
+plugins:
+  - local: protoc-gen-go
+    out: ../gen
+    opt:
+      - paths=source_relative
